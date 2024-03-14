@@ -1,0 +1,16 @@
+html, body {
+  height: 100%; /* Make sure html and body take up the full height */
+  width: 100%;
+  margin: 0; /* Remove default margin */
+  display: flex; /* Use flexbox to arrange children */
+  flex-direction: column; /* Align children vertically */
+}
+
+body {
+  align-items: center; /* Center children horizontally */
+  justify-content: center; /* Center children vertically */
+}
+
+canvas {
+  flex-grow: 1; /* Allow the canvas to grow and fill the available space */
+}
