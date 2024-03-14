@@ -32,7 +32,11 @@ const e = world.createEntity({
                 0, 1, 1,
                 1, 1, 0
             ],
+        },
 
+        TransformComponent: {
+            position: [0, 0, 0],
+            rotation: [0, 0, 0]
         }
     }
 });

@@ -13,6 +13,7 @@ window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
+window.dispatchEvent(new Event('resize'));
 
 export default device;
 

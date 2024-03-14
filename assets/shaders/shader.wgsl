@@ -1,10 +1,9 @@
-/*
 @group(0) @binding(0) var<uniform> projection: mat4x4f;
 @group(0) @binding(1) var<uniform> view: mat4x4f;
-@group(0) @binding(2) var<uniform> viewInverse: mat4x4f;
+
 
 @group(1) @binding(0) var<uniform> model: mat4x4f;
-
+/*
 @group(2) @binding(0) var uSampler: sampler;
 @group(2) @binding(1) var uTexture: texture_2d<f32>;
 */
@@ -22,7 +21,7 @@ fn vertex(
 ) -> VS_OUT {
     var out: VS_OUT;
 
-    out.position = /*projection * view * model * */vec4f(a_position, 1.f);
+    out.position = projection * view * model * vec4f(a_position, 1.f);
     out.color = a_color;
 
     return out;

@@ -40,6 +40,8 @@ let pipeline = device.createRenderPipeline({
     },
 });
 
+// @todo move to own file
+export { pipeline };
 
 export default class MeshComponent extends Component {
     buffers: GPUBuffer[] = [];
