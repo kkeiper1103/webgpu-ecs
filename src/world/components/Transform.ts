@@ -2,7 +2,7 @@ import {vec3, mat4, quat} from 'gl-matrix'
 import device from "../../gpu/device.ts";
 import {Component} from "ape-ecs";
 
-export default class TransformComponent extends Component {
+export default class Transform extends Component {
     buffer: GPUBuffer;
 
     protected _quat: quat = quat.create();
@@ -39,7 +39,7 @@ type TransformComponentPropertiesType = {
     scale: vec3,
     origin: vec3
 };
-TransformComponent.properties = {
+Transform.properties = {
     position: [0, 0, 0],
     rotation: [0, 0, 0],
     scale: [1, 1, 1],

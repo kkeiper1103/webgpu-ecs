@@ -2,11 +2,11 @@ import {Query, System} from "ape-ecs";
 import {mat4} from "gl-matrix";
 import device, {context} from "../../gpu/device.ts";
 
-import MeshComponent from "../components/MeshComponent.ts";
-import TransformComponent from "../components/TransformComponent.ts";
-import MetaValuesComponent from "../components/MetaValuesComponent.ts";
+import Mesh from "../components/Mesh.ts";
+import Transform from "../components/Transform.ts";
+import MetaValues from "../components/MetaValues.ts";
 
-import {pipeline} from "../components/MeshComponent.ts";
+import {pipeline} from "../components/Mesh.ts";
 
 /**
  * @property query Query
@@ -17,7 +17,7 @@ export default class RenderSystem extends System {
         super.init(...initArgs);
 
         this.query = this.createQuery()
-            .fromAll(MeshComponent.name, TransformComponent.name);
+            .fromAll(Mesh.name, Transform.name);
 
 
         // create buffers
@@ -69,13 +69,13 @@ export default class RenderSystem extends System {
         renderPass.setBindGroup(0, this.projectionViewBindgroup);
 
         this.query.execute().forEach(e => {
-            const mesh = <MeshComponent> e.getOne(MeshComponent.name),
-                transform = <TransformComponent> e.getOne(TransformComponent.name);
+            const mesh = <Mesh> e.getOne(Mesh.name),
+                transform = <Transform> e.getOne(Transform.name);
 
             //
-            if(!e.has(MetaValuesComponent.name)) {
+            if(!e.has(MetaValues.name)) {
                 const meta = {
-                    type: MetaValuesComponent.name,
+                    type: MetaValues.name,
 
                     modelBindGroup: device.createBindGroup({
                         label: "Model BindGroup",
@@ -106,7 +106,7 @@ export default class RenderSystem extends System {
                 e.addComponent(meta);
             }
 
-            const meta = e.getOne(MetaValuesComponent.name) as MetaValuesComponent;
+            const meta = e.getOne(MetaValues.name) as MetaValues;
             device.queue.writeBuffer(transform.buffer, 0, transform.model);
 
             renderPass.setPipeline(mesh.pipeline);

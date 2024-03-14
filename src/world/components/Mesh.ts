@@ -43,7 +43,7 @@ let pipeline = device.createRenderPipeline({
 // @todo move to own file
 export { pipeline };
 
-export default class MeshComponent extends Component {
+export default class Mesh extends Component {
     buffers: GPUBuffer[] = [];
     pipeline: GPURenderPipeline = pipeline;
     numVertices: number = 0;
@@ -81,7 +81,7 @@ export default class MeshComponent extends Component {
     }
 }
 
-MeshComponent.properties = {
+Mesh.properties = {
     buffers: Array<GPUBuffer>(),
     numVertices: 0,
     pipeline: pipeline

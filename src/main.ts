@@ -13,7 +13,7 @@ const shader = device.createShaderModule({
 const e = world.createEntity({
     id: "triangle",
     c: {
-        MeshComponent: {
+        Mesh: {
             positions: [
                 -1, 1, 0,
                 1, -1, 0,
@@ -34,7 +34,7 @@ const e = world.createEntity({
             ],
         },
 
-        TransformComponent: {
+        Transform: {
             position: [0, 0, 0],
             rotation: [0, 0, 0]
         }

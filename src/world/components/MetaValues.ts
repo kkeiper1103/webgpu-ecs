@@ -1,10 +1,10 @@
 import {Component} from "ape-ecs";
 
-export default class MetaValuesComponent extends Component {
+export default class MetaValues extends Component {
 
 }
 
-MetaValuesComponent.properties = {
+MetaValues.properties = {
     modelBindGroup: undefined,
     materialBindGroup: undefined
 }
