@@ -3,10 +3,10 @@
 
 
 @group(1) @binding(0) var<uniform> model: mat4x4f;
-/*
+
 @group(2) @binding(0) var uSampler: sampler;
 @group(2) @binding(1) var uTexture: texture_2d<f32>;
-*/
+
 
 struct VS_OUT {
     @builtin(position) position: vec4f,
@@ -33,6 +33,8 @@ fn fragment(
     input: VS_OUT
 ) -> @location(0) vec4f {
     let FragColor: vec4f = vec4f(input.color, 1.f);
+
+    var texel = textureSample(uTexture, uSampler, vec2f(1.0, 1.0));
 
     return FragColor;
 }

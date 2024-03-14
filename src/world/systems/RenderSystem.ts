@@ -84,6 +84,22 @@ export default class RenderSystem extends System {
                             binding: 0,
                             resource: { buffer: transform.buffer }
                         }]
+                    }),
+
+                    materialBindGroup: device.createBindGroup({
+                        label: "Material BindGroup",
+                        layout: pipeline.getBindGroupLayout(2),
+                        entries: [{
+                            binding: 0,
+                            resource: device.createSampler()
+                        }, {
+                            binding: 1,
+                            resource: device.createTexture({
+                                format: 'rgba8unorm',
+                                size: [128, 128],
+                                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST
+                            }).createView()
+                        }]
                     })
                 }
 
@@ -95,6 +111,7 @@ export default class RenderSystem extends System {
 
             renderPass.setPipeline(mesh.pipeline);
             renderPass.setBindGroup(1, meta.modelBindGroup);
+            renderPass.setBindGroup(2, meta.materialBindGroup);
             renderPass.setVertexBuffer(0, mesh.buffers[0]);
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
             renderPass.draw(mesh.numVertices);

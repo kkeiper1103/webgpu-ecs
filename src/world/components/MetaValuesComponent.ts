@@ -5,5 +5,6 @@ export default class MetaValuesComponent extends Component {
 }
 
 MetaValuesComponent.properties = {
-    modelBindGroup: undefined
+    modelBindGroup: undefined,
+    materialBindGroup: undefined
 }
