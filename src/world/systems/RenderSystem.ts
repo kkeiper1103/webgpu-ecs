@@ -1,6 +1,11 @@
-import {System} from "ape-ecs";
+import {Query, System} from "ape-ecs";
 import device, {context} from "../../gpu/device.ts";
 
+import MeshComponent from "../components/MeshComponent.ts";
+
+/**
+ * @property query Query
+ */
 export default class RenderSystem extends System {
 
     init(...initArgs) {
@@ -13,11 +18,6 @@ export default class RenderSystem extends System {
         super.update(tick);
 
         const encoder = device.createCommandEncoder();
-        let computePass = encoder.beginComputePass({
-
-        });
-
-        computePass.end();
 
         let renderPass = encoder.beginRenderPass({
             colorAttachments: [{
@@ -29,7 +29,12 @@ export default class RenderSystem extends System {
         });
 
         this.query.execute().forEach(e => {
+            const mesh = <MeshComponent> e.getOne(MeshComponent.name);
 
+            renderPass.setPipeline(mesh.pipeline);
+            renderPass.setVertexBuffer(0, mesh.buffers[0]);
+            renderPass.setVertexBuffer(1, mesh.buffers[1]);
+            renderPass.draw(mesh.numVertices);
         });
 
         renderPass.end();
