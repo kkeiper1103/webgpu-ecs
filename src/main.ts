@@ -31,17 +31,19 @@ const e = world.createEntity({
                 0, 1, 0,
                 0, 1, 1,
                 1, 1, 0
-            ]
+            ],
+
         }
     }
 });
 
-
+let last = performance.now();
 requestAnimationFrame(function render(now) {
     requestAnimationFrame(render);
 
-    world.runSystems("update");
-    world.runSystems("collision");
+    const dt = (now - last) / 1000;
+    last = now;
 
+    world.runSystems("update");
     world.runSystems("render");
 });
