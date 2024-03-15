@@ -6,6 +6,10 @@ import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 
 export default class Mesh extends Component {
+    static nextId: number = 1;
+    _id: number = 0;
+
+
     buffers: GPUBuffer[] = [];
     indexBuffer: GPUBuffer;
     pipeline: GPURenderPipeline = positionColorUvPipeline;
@@ -15,9 +19,11 @@ export default class Mesh extends Component {
     init(initial: any) {
         super.init(initial);
 
+        this._id = Mesh.nextId++;
+
         const positions = new Float32Array(initial.positions);
         this.buffers[0] = device.createBuffer({
-            label: "Position Buffer",
+            label: "Position Buffer for Mesh #" + this._id,
             size: positions.byteLength,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
@@ -26,7 +32,7 @@ export default class Mesh extends Component {
 
         const colors = new Float32Array(initial.colors);
         this.buffers[1] = device.createBuffer({
-            label: "Color Buffer",
+            label: "Color Buffer for Mesh #" + this._id,
             size: colors.byteLength,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
@@ -34,16 +40,18 @@ export default class Mesh extends Component {
 
         const uvs = new Float32Array(initial.uvs);
         this.buffers[2] = device.createBuffer({
-            label: "UV Buffer",
+            label: "UV Buffer for Mesh #" + this._id,
             size: uvs.byteLength,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
         device.queue.writeBuffer(this.buffers[2], 0, uvs);
 
+        let indices = initial.indices || generateIndices(initial.positions);
+
         //
-        const indices = new Uint32Array(initial.indices);
+        indices = new Uint16Array(indices);
         this.indexBuffer = device.createBuffer({
-            label: "Index Buffer",
+            label: "Index Buffer for Mesh #" + this._id,
             size: indices.byteLength,
             usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
         });
@@ -53,6 +61,9 @@ export default class Mesh extends Component {
         //
         if(!!initial.pipeline)
             this.pipeline = positionColorUvPipeline;
+
+        // ?
+        this.update();
     }
 
 
@@ -74,3 +85,16 @@ Mesh.properties = {
     numVertices: 0,
     pipeline: positionColorUvPipeline
 };
+
+function generateIndices(positions: number[]): number[] {
+    return Array.from({length: positions.length / 3}, (_, index) => index);
+}
+
+function range(start: number, end: number): number[] {
+    const length = end - start + 1;
+    let arr = Array.from({ length }, (_, i) => start + i);
+
+    console.log('generating index array for non-indexed geometry', arr);
+
+    return arr;
+}

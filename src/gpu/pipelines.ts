@@ -48,8 +48,14 @@ const positionColorUvPipeline = device.createRenderPipeline({
     },
     depthStencil: {
         depthWriteEnabled: true,
-        format: 'depth24plus',
+        format: 'depth32float',
         depthCompare: 'less'
+    },
+    primitive: {
+        // stripIndexFormat: "uint16",
+        topology: 'triangle-list',
+        frontFace: "ccw",
+        cullMode: 'none'
     }
 });
 

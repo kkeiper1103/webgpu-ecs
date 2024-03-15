@@ -3,6 +3,9 @@ import device from "@gpu/device.ts";
 import {Component} from "ape-ecs";
 
 export default class Transform extends Component {
+    static nextId: number = 1;
+    _id: number = 0;
+
     buffer: GPUBuffer;
 
     protected _quat: quat = quat.create();
@@ -11,8 +14,10 @@ export default class Transform extends Component {
     init(initial: any) {
         super.init(initial);
 
+        this._id = Transform.nextId++;
+
         this.buffer = device.createBuffer({
-            label: "model buffer",
+            label: "Model Buffer for Transform #" + this._id,
             size: 16 * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
         });

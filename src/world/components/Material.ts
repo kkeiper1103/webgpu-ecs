@@ -3,18 +3,27 @@ import device from "@gpu/device.ts";
 
 export default class Material extends Component {
 
+    static nextId: number = 1;
+    _id: number = 0;
+
     texture: GPUTexture;
     sampler: GPUSampler;
 
+
     init(initial: any) {
         super.init(initial);
+
+        this._id = Material.nextId++;
 
         let size = initial.size || this.size;
         if(initial.image) size = [initial.image.width, initial.image.height];
 
         let pixels = initial.pixels || this.pixels;
         let textureDescriptor = initial.textureDescriptor || this.textureDescriptor;
+        textureDescriptor.label = "Texture Handle for Material #" + this._id;
+
         let samplerDescriptor = initial.samplerDescriptor || this.samplerDescriptor;
+        samplerDescriptor.label = "Sampler Handle for Material #" + this._id;
 
         // wrap the pixels if they're not a Uint8ClampedArray
         if(!(pixels instanceof Uint8ClampedArray) && Array.isArray(pixels))

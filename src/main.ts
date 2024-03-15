@@ -6,19 +6,23 @@ import Material from "./world/components/Material.ts";
 
 
 
-const e1 = createIndexedEntity();
-e1.c.Transform.position = [-1, 0, 3];
 
-const e2 = createIndexedEntity();
-e2.c.Transform.position = [2, 0, 2];
 
-const e4 = createTestEntity();
-e4.c.Transform.position = [-2, 0, -2];
-/*
+
 
 const e3 = createTestEntity();
 e3.c.Transform.position = [3, 3, -3];
-*/
+
+const e4 = createTestEntity();
+e4.c.Transform.position = [-2, 0, -2];
+
+const e1 = createIndexedEntity();
+e1.c.Transform.position = [-1, 0, -4];
+
+const e2 = createIndexedEntity();
+e2.c.Transform.position = [2, 0, -6];
+
+
 
 
 
@@ -41,10 +45,10 @@ function createIndexedEntity() {
         c: {
             Mesh: {
                 positions: [
+                    -.5, .5, 0,
+                    -.5, -.5, 0,
                     .5, .5, 0,
                     .5, -.5, 0,
-                    -.5, -.5, 0,
-                    -.5, .5, 0
                 ],
                 colors: [
                     1, 0, 0,
@@ -53,20 +57,20 @@ function createIndexedEntity() {
                     1, 1, 0,
                 ],
                 uvs: [
-                    1, 1,
-                    1, 0,
                     0, 0,
                     0, 1,
+                    1, 0,
+                    1, 1,
                 ],
                 indices: [
-                    0, 1, 3,
-                    1, 2, 3
+                    0, 1, 2,
+                    2, 1, 3
                 ]
             },
             Material: {
                 pixels: [
-                    255, 0, 255, 255, 255, 255, 255, 255,
-                    255, 255, 255, 255, 255, 0, 255, 255
+                    255, 0, 255, 255,       255, 255, 255, 255,
+                    255, 255, 255, 255,     255, 0, 255, 255
                 ],
                 size: [2, 2],
                 samplerDescriptor: {
@@ -91,30 +95,31 @@ function createTestEntity() : Entity {
         c: {
             Mesh: {
                 positions: [
-                    1, 1, 0,
-                    1, -1, 0,
-                    -1, 1, 0,
+                    -.5, .5, 0, //0
+                    -.5, -.5, 0, //1
+                    .5, .5, 0, //2
 
-                    1, -1, 0,
-                    -1, -1, 0,
-                    -1, 1, 0
+                    .5, .5, 0, //2
+                    -.5, -.5, 0, //1
+                    .5, -.5, 0, //3
                 ],
                 colors: [
-                    1, 1, 0,
-                    1, 1, 0,
-                    1, 1, 0,
-                    1, 1, 0,
-                    1, 1, 0,
-                    1, 1, 0,
+                    1, 0, 0, //0
+                    0, 1, 0, //1
+                    0, 0, 1, //2
+
+                    0, 0, 1, //2
+                    0, 1, 0, //1
+                    1, 1, 0, //3
                 ],
                 uvs: [
-                    1, 0,
-                    1, 1,
-                    0, 0,
+                    0, 0, //0
+                    0, 1, //1
+                    1, 0, //2
 
-                    1, 1,
-                    0, 1,
-                    0, 0
+                    1, 0, //2
+                    0, 1, //1
+                    1, 1, //3
                 ]
             },
 

@@ -39,7 +39,7 @@ export default class RenderSystem extends System {
         // create depthTexture to have z-ordering
         depthTexture = device.createTexture({
             size: [context.canvas.width, context.canvas.height],
-            format: 'depth24plus',
+            format: 'depth32float',
             sampleCount: 4,
             usage: GPUTextureUsage.RENDER_ATTACHMENT
         })
@@ -74,7 +74,7 @@ export default class RenderSystem extends System {
         super.update(tick);
 
         device.queue.writeBuffer(buffers[0], 0, mat4.perspective(mat4.create(), 45 * Math.PI / 180, context.canvas.width / context.canvas.height, .1, 100));
-        device.queue.writeBuffer(buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 5], [0, 0, 0], [0, 1, 0]));
+        device.queue.writeBuffer(buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 10], [0, 0, 0], [0, 1, 0]));
 
         const encoder = device.createCommandEncoder();
 
@@ -95,6 +95,9 @@ export default class RenderSystem extends System {
         });
 
         renderPass.setBindGroup(0, projectionViewBindGroup);
+        renderPass.setViewport(0, 0, context.canvas.width, context.canvas.height, 0, 1);
+        renderPass.setScissorRect(0, 0, context.canvas.width, context.canvas.height);
+
         meshQuery.refresh().execute().forEach(e => {
             const mesh = <Mesh> e.getOne(Mesh.name),
                 transform = <Transform> e.getOne(Transform.name),
@@ -133,6 +136,7 @@ export default class RenderSystem extends System {
             const meta = e.getOne(MetaValues.name) as MetaValues;
             device.queue.writeBuffer(transform.buffer, 0, transform.model);
 
+
             renderPass.setPipeline(mesh.pipeline);
             renderPass.setBindGroup(1, meta.modelBindGroup);
             renderPass.setBindGroup(2, meta.materialBindGroup);
@@ -141,12 +145,20 @@ export default class RenderSystem extends System {
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
             renderPass.setVertexBuffer(2, mesh.buffers[2]);
 
-            if(mesh.numElements > 0) {
-                renderPass.setIndexBuffer(mesh.indexBuffer, "uint32");
-                renderPass.drawIndexed(mesh.numElements, 1);
-            } else {
-                renderPass.draw(mesh.numVertices, 1);
+            // renderPass.setIndexBuffer(mesh.indexBuffer, "uint16");
+            // renderPass.drawIndexed(mesh.numElements);
+
+            if(mesh.indices.length > 0) {
+
+                renderPass.setVertexBuffer(0, null);
+                renderPass.setVertexBuffer(1, null);
+                renderPass.setVertexBuffer(2, null);
             }
+            else {
+                renderPass.draw(mesh.numVertices);
+                console.log('hello', mesh)
+            }
+
         });
 
         renderPass.end();
