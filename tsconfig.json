@@ -22,7 +22,14 @@
     "types": [
       "@webgpu/types",
       "vite-plugin-glsl/ext"
-    ]
+    ],
+    "baseUrl": ".",
+
+    "paths": {
+      "@gpu/*": [
+        "./src/gpu/*"
+      ]
+    }
   },
   "include": ["src"]
 }

@@ -1,8 +1,8 @@
 import {Component} from "ape-ecs";
-import device from "../../gpu/device.ts";
+import device from "@gpu/device.ts";
 
 
-import {positionColorUvPipeline} from "../../gpu/pipelines.ts";
+import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 
 export default class Mesh extends Component {

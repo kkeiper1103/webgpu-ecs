@@ -1,5 +1,5 @@
 import {vec3, mat4, quat} from 'gl-matrix'
-import device from "../../gpu/device.ts";
+import device from "@gpu/device.ts";
 import {Component} from "ape-ecs";
 
 export default class Transform extends Component {

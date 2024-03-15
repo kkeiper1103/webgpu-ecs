@@ -1,5 +1,5 @@
 import {Component} from "ape-ecs";
-import device from "../../gpu/device.ts";
+import device from "@gpu/device.ts";
 
 export default class Material extends Component {
 

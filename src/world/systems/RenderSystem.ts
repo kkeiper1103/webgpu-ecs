@@ -1,13 +1,13 @@
 import {Query, System} from "ape-ecs";
 import {mat4} from "gl-matrix";
-import device, {context} from "../../gpu/device.ts";
+import device, {context} from "@gpu/device.ts";
 
 import Mesh from "../components/Mesh.ts";
 import Transform from "../components/Transform.ts";
 import MetaValues from "../components/MetaValues.ts";
 
 import Material from "../components/Material.ts";
-import {positionColorUvPipeline} from "../../gpu/pipelines.ts";
+import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 /**
  * @property query Query
