@@ -14,9 +14,11 @@ e2.c.Transform.position = [2, 0, 2];
 
 const e4 = createTestEntity();
 e4.c.Transform.position = [-2, 0, -2];
+/*
 
 const e3 = createTestEntity();
 e3.c.Transform.position = [3, 3, -3];
+*/
 
 
 

@@ -73,7 +73,7 @@ export default class RenderSystem extends System {
     update(tick: number) {
         super.update(tick);
 
-        device.queue.writeBuffer(buffers[0], 0, mat4.perspective(mat4.create(), 45 * Math.PI / 180, 1024 / 768, .1, 100));
+        device.queue.writeBuffer(buffers[0], 0, mat4.perspective(mat4.create(), 45 * Math.PI / 180, context.canvas.width / context.canvas.height, .1, 100));
         device.queue.writeBuffer(buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 5], [0, 0, 0], [0, 1, 0]));
 
         const encoder = device.createCommandEncoder();
