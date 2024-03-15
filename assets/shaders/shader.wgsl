@@ -10,19 +10,22 @@
 
 struct VS_OUT {
     @builtin(position) position: vec4f,
-    @location(1) color: vec3f
+    @location(1) color: vec3f,
+    @location(2) uv: vec2f
 };
 
 
 @vertex
 fn vertex(
     @location(0) a_position: vec3f,
-    @location(1) a_color: vec3f
+    @location(1) a_color: vec3f,
+    @location(2) a_uv: vec2f
 ) -> VS_OUT {
     var out: VS_OUT;
 
     out.position = projection * view * model * vec4f(a_position, 1.f);
     out.color = a_color;
+    out.uv = a_uv;
 
     return out;
 }
@@ -32,9 +35,7 @@ fn vertex(
 fn fragment(
     input: VS_OUT
 ) -> @location(0) vec4f {
-    let FragColor: vec4f = vec4f(input.color, 1.f);
+    var texel: vec4f = textureSample(uTexture, uSampler, input.uv);
 
-    var texel = textureSample(uTexture, uSampler, vec2f(1.0, 1.0));
-
-    return FragColor;
+    return mix(texel, vec4f(input.color, 1.f), .3);
 }

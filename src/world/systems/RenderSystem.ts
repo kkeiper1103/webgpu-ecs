@@ -7,6 +7,7 @@ import Transform from "../components/Transform.ts";
 import MetaValues from "../components/MetaValues.ts";
 
 import {pipeline} from "../components/Mesh.ts";
+import Material from "../components/Material.ts";
 
 /**
  * @property query Query
@@ -17,7 +18,7 @@ export default class RenderSystem extends System {
         super.init(...initArgs);
 
         this.query = this.createQuery()
-            .fromAll(Mesh.name, Transform.name);
+            .fromAll(Mesh.name, Transform.name, Material.name);
 
 
         // create buffers
@@ -53,8 +54,6 @@ export default class RenderSystem extends System {
         device.queue.writeBuffer(this.buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 5], [0, 0, 0], [0, 1, 0]));
 
 
-
-
         const encoder = device.createCommandEncoder();
 
         let renderPass = encoder.beginRenderPass({
@@ -68,9 +67,12 @@ export default class RenderSystem extends System {
 
         renderPass.setBindGroup(0, this.projectionViewBindgroup);
 
-        this.query.execute().forEach(e => {
+        this.query.refresh().execute().forEach(e => {
             const mesh = <Mesh> e.getOne(Mesh.name),
-                transform = <Transform> e.getOne(Transform.name);
+                transform = <Transform> e.getOne(Transform.name),
+                material = <Material> e.getOne(Material.name);
+
+            console.log('rendering?');
 
             //
             if(!e.has(MetaValues.name)) {
@@ -91,14 +93,10 @@ export default class RenderSystem extends System {
                         layout: pipeline.getBindGroupLayout(2),
                         entries: [{
                             binding: 0,
-                            resource: device.createSampler()
+                            resource: material.sampler
                         }, {
                             binding: 1,
-                            resource: device.createTexture({
-                                format: 'rgba8unorm',
-                                size: [128, 128],
-                                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST
-                            }).createView()
+                            resource: material.texture.createView()
                         }]
                     })
                 }
@@ -114,6 +112,7 @@ export default class RenderSystem extends System {
             renderPass.setBindGroup(2, meta.materialBindGroup);
             renderPass.setVertexBuffer(0, mesh.buffers[0]);
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
+            renderPass.setVertexBuffer(2, mesh.buffers[2]);
             renderPass.draw(mesh.numVertices);
         });
 

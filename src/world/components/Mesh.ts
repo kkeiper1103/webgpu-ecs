@@ -29,6 +29,13 @@ let pipeline = device.createRenderPipeline({
                 offset: 0,
                 shaderLocation: 1
             }]
+        }, {
+            arrayStride: 8,
+            attributes: [{
+                format: "float32x2",
+                offset: 0,
+                shaderLocation: 2
+            }]
         }]
     },
     fragment: {
@@ -51,22 +58,32 @@ export default class Mesh extends Component {
     init(initial: any) {
         super.init(initial);
 
-        let data = new Float32Array(initial.positions);
+        console.log(initial);
+
+        const positions = new Float32Array(initial.positions);
         this.buffers[0] = device.createBuffer({
             label: "Position Buffer",
-            size: data.byteLength,
+            size: positions.byteLength,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
-        device.queue.writeBuffer(this.buffers[0], 0, data);
-        this.numVertices = data.length / 3;
+        device.queue.writeBuffer(this.buffers[0], 0, positions);
+        this.numVertices = positions.length / 3;
 
-        data = new Float32Array(initial.colors);
+        const colors = new Float32Array(initial.colors);
         this.buffers[1] = device.createBuffer({
             label: "Color Buffer",
-            size: data.byteLength,
+            size: colors.byteLength,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
-        device.queue.writeBuffer(this.buffers[1], 0, data);
+        device.queue.writeBuffer(this.buffers[1], 0, colors);
+
+        const uvs = new Float32Array(initial.uvs);
+        this.buffers[2] = device.createBuffer({
+            label: "UV Buffer",
+            size: uvs.byteLength,
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+        });
+        device.queue.writeBuffer(this.buffers[2], 0, uvs);
 
         //
         if(!!initial.pipeline)
