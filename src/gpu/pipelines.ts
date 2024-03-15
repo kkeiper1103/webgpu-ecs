@@ -43,6 +43,14 @@ const positionColorUvPipeline = device.createRenderPipeline({
             format: navigator.gpu.getPreferredCanvasFormat()
         }]
     },
+    multisample: {
+        count: 4,
+    },
+    depthStencil: {
+        depthWriteEnabled: true,
+        format: 'depth24plus',
+        depthCompare: 'less'
+    }
 });
 
 export {

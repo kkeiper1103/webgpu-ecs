@@ -13,8 +13,6 @@ export default class Mesh extends Component {
     init(initial: any) {
         super.init(initial);
 
-        console.log(initial);
-
         const positions = new Float32Array(initial.positions);
         this.buffers[0] = device.createBuffer({
             label: "Position Buffer",
@@ -55,6 +53,9 @@ export default class Mesh extends Component {
 
 Mesh.properties = {
     buffers: Array<GPUBuffer>(),
+    positions: [],
+    uvs: [],
+    colors: [], // should this be a uniform instead?
     numVertices: 0,
     pipeline: positionColorUvPipeline
 };

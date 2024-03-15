@@ -6,12 +6,14 @@ import UpdateSystem from "./systems/UpdateSystem.ts";
 import Transform from "./components/Transform.ts";
 import MetaValues from "./components/MetaValues.ts";
 import Material from "./components/Material.ts";
+import IndexedMesh from "./components/IndexedMesh.ts";
 
 
 const world = new World();
 
 
 world.registerComponent(Mesh);
+world.registerComponent(IndexedMesh);
 world.registerComponent(Transform);
 world.registerComponent(MetaValues);
 world.registerComponent(Material);
