@@ -6,8 +6,8 @@ import Mesh from "../components/Mesh.ts";
 import Transform from "../components/Transform.ts";
 import MetaValues from "../components/MetaValues.ts";
 
-import {pipeline} from "../components/Mesh.ts";
 import Material from "../components/Material.ts";
+import {positionColorUvPipeline} from "../../gpu/pipelines.ts";
 
 /**
  * @property query Query
@@ -36,7 +36,7 @@ export default class RenderSystem extends System {
 
         this.projectionViewBindgroup = device.createBindGroup({
             label: "BindGroup Component",
-            layout: pipeline.getBindGroupLayout(0),
+            layout: positionColorUvPipeline.getBindGroupLayout(0),
             entries: [{
                 binding: 0,
                 resource: { buffer: this.buffers[0] }
@@ -72,8 +72,6 @@ export default class RenderSystem extends System {
                 transform = <Transform> e.getOne(Transform.name),
                 material = <Material> e.getOne(Material.name);
 
-            console.log('rendering?');
-
             //
             if(!e.has(MetaValues.name)) {
                 const meta = {
@@ -81,7 +79,7 @@ export default class RenderSystem extends System {
 
                     modelBindGroup: device.createBindGroup({
                         label: "Model BindGroup",
-                        layout: pipeline.getBindGroupLayout(1),
+                        layout: positionColorUvPipeline.getBindGroupLayout(1),
                         entries: [{
                             binding: 0,
                             resource: { buffer: transform.buffer }
@@ -90,7 +88,7 @@ export default class RenderSystem extends System {
 
                     materialBindGroup: device.createBindGroup({
                         label: "Material BindGroup",
-                        layout: pipeline.getBindGroupLayout(2),
+                        layout: positionColorUvPipeline.getBindGroupLayout(2),
                         entries: [{
                             binding: 0,
                             resource: material.sampler

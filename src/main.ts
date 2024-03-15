@@ -1,13 +1,7 @@
 import './style.css'
 
-import device from "./gpu/device.ts";
 import world from "./world";
 
-import shader_code from '../assets/shaders/shader.wgsl'
-const shader = device.createShaderModule({
-    label: "Shader Module",
-    code: shader_code
-});
 
 let image = new Image();
 image.onload = () => {
@@ -25,13 +19,12 @@ image.onload = () => {
                     -1, 1, 0
                 ],
                 colors: [
-                    1, 1, 1,
-                    1, 0, 1,
-                    0, 0, 1,
-
-                    0, 1, 0,
-                    0, 1, 1,
-                    1, 1, 0
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
                 ],
                 uvs: [
                     1, 0,

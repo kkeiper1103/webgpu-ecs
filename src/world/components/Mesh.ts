@@ -2,57 +2,12 @@ import {Component} from "ape-ecs";
 import device from "../../gpu/device.ts";
 
 
-import shader_src from "../../../assets/shaders/shader.wgsl";
+import {positionColorUvPipeline} from "../../gpu/pipelines.ts";
 
-let shader = device.createShaderModule({
-    label: "General Shader Module",
-    code: shader_src
-});
-
-let pipeline = device.createRenderPipeline({
-    label: "Basic Render Pipeline",
-    layout: "auto",
-    vertex: {
-        module: shader,
-        entryPoint: "vertex",
-        buffers: [{
-            arrayStride: 12,
-            attributes: [{
-                format: "float32x3",
-                offset: 0,
-                shaderLocation: 0
-            }]
-        }, {
-            arrayStride: 12,
-            attributes: [{
-                format: "float32x3",
-                offset: 0,
-                shaderLocation: 1
-            }]
-        }, {
-            arrayStride: 8,
-            attributes: [{
-                format: "float32x2",
-                offset: 0,
-                shaderLocation: 2
-            }]
-        }]
-    },
-    fragment: {
-        module: shader,
-        entryPoint: "fragment",
-        targets: [{
-            format: navigator.gpu.getPreferredCanvasFormat()
-        }]
-    },
-});
-
-// @todo move to own file
-export { pipeline };
 
 export default class Mesh extends Component {
     buffers: GPUBuffer[] = [];
-    pipeline: GPURenderPipeline = pipeline;
+    pipeline: GPURenderPipeline = positionColorUvPipeline;
     numVertices: number = 0;
 
     init(initial: any) {
@@ -87,7 +42,7 @@ export default class Mesh extends Component {
 
         //
         if(!!initial.pipeline)
-            this.pipeline = pipeline;
+            this.pipeline = positionColorUvPipeline;
     }
 
 
@@ -101,5 +56,5 @@ export default class Mesh extends Component {
 Mesh.properties = {
     buffers: Array<GPUBuffer>(),
     numVertices: 0,
-    pipeline: pipeline
+    pipeline: positionColorUvPipeline
 };
