@@ -1,10 +1,7 @@
-import {Component} from "ape-ecs";
+import {Component} from "@jakeklassen/ecs";
 
 export default class MetaValues extends Component {
 
-}
-
-MetaValues.properties = {
-    modelBindGroup: undefined,
-    materialBindGroup: undefined
+    modelBindGroup: GPUBindGroup;
+    materialBindGroup: GPUBindGroup;
 }

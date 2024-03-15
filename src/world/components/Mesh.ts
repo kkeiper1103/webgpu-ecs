@@ -1,14 +1,23 @@
-import {Component} from "ape-ecs";
+import {Component} from "@jakeklassen/ecs";
 import device from "@gpu/device.ts";
 
 
 import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
+type Props = {
+    positions: number[],
+    uvs: number[],
+    colors: number[],
+    indices?: number[],
+
+    pipeline?: GPURenderPipeline
+};
 
 export default class Mesh extends Component {
     static nextId: number = 1;
     _id: number = 0;
 
+    indices: number[] = []
 
     buffers: GPUBuffer[] = [];
     indexBuffer: GPUBuffer;
@@ -16,8 +25,8 @@ export default class Mesh extends Component {
     numVertices: number = 0;
     numElements: number = 0;
 
-    init(initial: any) {
-        super.init(initial);
+    constructor(initial: Props) {
+        super();
 
         this._id = Mesh.nextId++;
 
@@ -46,7 +55,7 @@ export default class Mesh extends Component {
         });
         device.queue.writeBuffer(this.buffers[2], 0, uvs);
 
-        let indices = initial.indices || generateIndices(initial.positions);
+        let indices: any = initial.indices || generateIndices(initial.positions);
 
         //
         indices = new Uint16Array(indices);
@@ -61,40 +70,16 @@ export default class Mesh extends Component {
         //
         if(!!initial.pipeline)
             this.pipeline = positionColorUvPipeline;
-
-        // ?
-        this.update();
     }
+
 
 
     destroy() {
         this.indexBuffer.destroy();
         this.buffers.forEach(buffer => buffer.destroy());
-
-        super.destroy();
     }
 }
 
-Mesh.properties = {
-    buffers: Array<GPUBuffer>(),
-    indexBuffer: null,
-    indices: [],
-    positions: [],
-    uvs: [],
-    colors: [], // should this be a uniform instead?
-    numVertices: 0,
-    pipeline: positionColorUvPipeline
-};
-
 function generateIndices(positions: number[]): number[] {
     return Array.from({length: positions.length / 3}, (_, index) => index);
-}
-
-function range(start: number, end: number): number[] {
-    const length = end - start + 1;
-    let arr = Array.from({ length }, (_, i) => start + i);
-
-    console.log('generating index array for non-indexed geometry', arr);
-
-    return arr;
 }

@@ -1,28 +1,32 @@
 import './style.css'
 
 import world from "./world";
-import {Entity} from "ape-ecs";
+
 import Material from "./world/components/Material.ts";
-
-
-
+import Mesh from "./world/components/Mesh.ts";
+import Transform from "./world/components/Transform.ts";
 
 
 
 
 const e3 = createTestEntity();
-e3.c.Transform.position = [3, 3, -3];
+// @ts-ignore
+world.getEntityComponents(e3).get<Transform>(Transform).position = [3, 3, -3];
 
 const e4 = createTestEntity();
-e4.c.Transform.position = [-2, 0, -2];
+// @ts-ignore
+world.getEntityComponents(e4).get<Transform>(Transform).position = [-2, 0, -2];
+
 
 const e1 = createIndexedEntity();
-e1.c.Transform.position = [-1, 0, -4];
+
+// @ts-ignore
+world.getEntityComponents(e1).get<Transform>(Transform).position = [-1, 0, -4];
 
 const e2 = createIndexedEntity();
-e2.c.Transform.position = [2, 0, -6];
 
-
+// @ts-ignore
+world.getEntityComponents(e2).get<Transform>(Transform).position = [2, 0, -6];
 
 
 
@@ -31,122 +35,122 @@ requestAnimationFrame(function render(now) {
     requestAnimationFrame(render);
 
     const dt = (now - last) / 1000;
+
+    world.updateSystems(dt);
+
     last = now;
-
-
-
-    world.runSystems("update");
-    world.runSystems("render");
-    world.tick()
 });
 
-function createIndexedEntity() {
-    return world.createEntity({
-        c: {
-            Mesh: {
-                positions: [
-                    -.5, .5, 0,
-                    -.5, -.5, 0,
-                    .5, .5, 0,
-                    .5, -.5, 0,
-                ],
-                colors: [
-                    1, 0, 0,
-                    0, 1, 0,
-                    0, 0, 1,
-                    1, 1, 0,
-                ],
-                uvs: [
-                    0, 0,
-                    0, 1,
-                    1, 0,
-                    1, 1,
-                ],
-                indices: [
-                    0, 1, 2,
-                    2, 1, 3
-                ]
-            },
-            Material: {
-                pixels: [
-                    255, 0, 255, 255,       255, 255, 255, 255,
-                    255, 255, 255, 255,     255, 0, 255, 255
-                ],
-                size: [2, 2],
-                samplerDescriptor: {
-                    addressModeU: "clamp-to-edge",
-                    addressModeV: "clamp-to-edge",
-                    minFilter: "nearest",
-                    magFilter: "nearest"
-                }
-            },
-            Transform: {
-                position: [-1, -1, -3],
-                rotation: [0, 0, 0],
-                scale: [2, 2.5, 2]
-            }
+function createIndexedEntity(): number {
+    const e = world.createEntity();
+
+    let mesh = new Mesh({
+        positions: [
+            -.5, .5, 0,
+            -.5, -.5, 0,
+            .5, .5, 0,
+            .5, -.5, 0,
+        ],
+        colors: [
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1,
+            1, 1, 0,
+        ],
+        uvs: [
+            0, 0,
+            0, 1,
+            1, 0,
+            1, 1,
+        ],
+        indices: [
+            0, 1, 2,
+            2, 1, 3
+        ]
+    });
+    let material = new Material({
+        pixels: [
+            255, 0, 255, 255,       255, 255, 255, 255,
+            255, 255, 255, 255,     255, 0, 255, 255
+        ],
+        size: [2, 2],
+        textureDescriptor: {
+            format: "rgba8unorm",
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
+            size: [2, 2]
+        },
+        samplerDescriptor: {
+            addressModeU: "clamp-to-edge",
+            addressModeV: "clamp-to-edge",
+            minFilter: "nearest",
+            magFilter: "nearest"
         }
     });
+    let transform = new Transform([-1, -1, -3],
+        [0, 0, 0],
+        [2, 2.5, 2]);
+
+    world.addEntityComponents(
+        e,
+        mesh, material, transform
+    );
+
+    return e;
 }
 
+
+
 //
-function createTestEntity() : Entity {
-    let e = world.createEntity({
-        c: {
-            Mesh: {
-                positions: [
-                    -.5, .5, 0, //0
-                    -.5, -.5, 0, //1
-                    .5, .5, 0, //2
+function createTestEntity() : number {
+    const e = world.createEntity();
 
-                    .5, .5, 0, //2
-                    -.5, -.5, 0, //1
-                    .5, -.5, 0, //3
-                ],
-                colors: [
-                    1, 0, 0, //0
-                    0, 1, 0, //1
-                    0, 0, 1, //2
+    let mesh = new Mesh({
+            positions: [
+                -.5, .5, 0, //0
+                -.5, -.5, 0, //1
+                .5, .5, 0, //2
 
-                    0, 0, 1, //2
-                    0, 1, 0, //1
-                    1, 1, 0, //3
-                ],
-                uvs: [
-                    0, 0, //0
-                    0, 1, //1
-                    1, 0, //2
+                .5, .5, 0, //2
+                -.5, -.5, 0, //1
+                .5, -.5, 0, //3
+            ],
+            colors: [
+                1, 0, 0, //0
+                0, 1, 0, //1
+                0, 0, 1, //2
 
-                    1, 0, //2
-                    0, 1, //1
-                    1, 1, //3
-                ]
-            },
+                0, 0, 1, //2
+                0, 1, 0, //1
+                1, 1, 0, //3
+            ],
+            uvs: [
+                0, 0, //0
+                0, 1, //1
+                1, 0, //2
 
-            Transform: {
-                position: [1, 0, 0],
-                rotation: [0, 0, 0],
-                scale: [2, 2, 2]
-            },
-        }
-    });
+                1, 0, //2
+                0, 1, //1
+                1, 1, //3
+            ]
+        }),
+        transform = new Transform();
+
+    world.addEntityComponents(
+        e,
+        mesh, transform
+    );
 
     let image = new Image();
     image.onload = () => {
-        e.addComponent({
+        world.addEntityComponents(e, new Material({
             type: Material.name,
             image,
 
-            /*
-            these are overridden when image is passed as an ImageBitmap
-
-            pixels: [
-                255, 0, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 0, 255, 255
-            ],
-            size: [2, 2],
-
-            */
+            textureDescriptor: {
+                size: [image.width, image.height],
+                format: "rgba8unorm",
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
+            },
 
             samplerDescriptor: {
                 addressModeU: "clamp-to-edge",
@@ -154,7 +158,7 @@ function createTestEntity() : Entity {
                 minFilter: "linear",
                 magFilter: "linear"
             } as GPUSamplerDescriptor
-        })
+        }));
     }
     image.onerror = () => { console.log('error') }
     image.src = "/zomboid.png";

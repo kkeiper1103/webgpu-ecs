@@ -1,9 +1,10 @@
-import {System} from "ape-ecs";
+import {
+    System, World
+} from "@jakeklassen/ecs";
 
 export default class UpdateSystem extends System {
 
-    update(tick: number) {
-        super.update(tick);
+    update(world: World, dt: number) {
 
     }
 }

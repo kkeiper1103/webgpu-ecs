@@ -1,4 +1,5 @@
-import {Query, System} from "ape-ecs";
+import {System, World} from "@jakeklassen/ecs"
+
 import {mat4} from "gl-matrix";
 import device, {context} from "@gpu/device.ts";
 
@@ -22,11 +23,9 @@ let meshQuery: Query,
  */
 export default class RenderSystem extends System {
 
-    init(...initArgs) {
-        super.init(...initArgs);
+    constructor() {
+        super();
 
-        meshQuery = this.createQuery()
-            .fromAll(Mesh.name, Transform.name, Material.name).persist();
 
         // create color texture
         colorTexture = device.createTexture({
@@ -70,8 +69,7 @@ export default class RenderSystem extends System {
         });
     }
 
-    update(tick: number) {
-        super.update(tick);
+    update(world: World, dt: number) {
 
         device.queue.writeBuffer(buffers[0], 0, mat4.perspective(mat4.create(), 45 * Math.PI / 180, context.canvas.width / context.canvas.height, .1, 100));
         device.queue.writeBuffer(buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 10], [0, 0, 0], [0, 1, 0]));
@@ -98,42 +96,40 @@ export default class RenderSystem extends System {
         renderPass.setViewport(0, 0, context.canvas.width, context.canvas.height, 0, 1);
         renderPass.setScissorRect(0, 0, context.canvas.width, context.canvas.height);
 
-        meshQuery.refresh().execute().forEach(e => {
-            const mesh = <Mesh> e.getOne(Mesh.name),
-                transform = <Transform> e.getOne(Transform.name),
-                material = <Material> e.getOne(Material.name);
+        const entities = world.view(Mesh, Transform, Material);
+        for(const [_, componentMap] of entities) {
+            const mesh = componentMap.get(Mesh),
+                transform = componentMap.get(Transform),
+                material = componentMap.get(Material);
 
-            //
-            if(!e.has(MetaValues.name)) {
-                const meta = {
-                    type: MetaValues.name,
 
-                    modelBindGroup: device.createBindGroup({
-                        label: "Model BindGroup",
-                        layout: positionColorUvPipeline.getBindGroupLayout(1),
-                        entries: [{
-                            binding: 0,
-                            resource: { buffer: transform.buffer }
-                        }]
-                    }),
+            if(!componentMap.has(MetaValues)) {
+                const meta = new MetaValues();
+                meta.modelBindGroup = device.createBindGroup({
+                    label: "Model BindGroup",
+                    layout: positionColorUvPipeline.getBindGroupLayout(1),
+                    entries: [{
+                        binding: 0,
+                        resource: { buffer: transform.buffer }
+                    }]
+                });
 
-                    materialBindGroup: device.createBindGroup({
-                        label: "Material BindGroup",
-                        layout: positionColorUvPipeline.getBindGroupLayout(2),
-                        entries: [{
-                            binding: 0,
-                            resource: material.sampler
-                        }, {
-                            binding: 1,
-                            resource: material.texture.createView()
-                        }]
-                    })
-                }
+                meta.materialBindGroup = device.createBindGroup({
+                    label: "Material BindGroup",
+                    layout: positionColorUvPipeline.getBindGroupLayout(2),
+                    entries: [{
+                        binding: 0,
+                        resource: material.sampler
+                    }, {
+                        binding: 1,
+                        resource: material.texture.createView()
+                    }]
+                });
 
-                e.addComponent(meta);
+                componentMap.add(meta);
             }
 
-            const meta = e.getOne(MetaValues.name) as MetaValues;
+            const meta = <MetaValues> componentMap.get(MetaValues);
             device.queue.writeBuffer(transform.buffer, 0, transform.model);
 
 
@@ -145,21 +141,9 @@ export default class RenderSystem extends System {
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
             renderPass.setVertexBuffer(2, mesh.buffers[2]);
 
-            // renderPass.setIndexBuffer(mesh.indexBuffer, "uint16");
-            // renderPass.drawIndexed(mesh.numElements);
-
-            if(mesh.indices.length > 0) {
-
-                renderPass.setVertexBuffer(0, null);
-                renderPass.setVertexBuffer(1, null);
-                renderPass.setVertexBuffer(2, null);
-            }
-            else {
-                renderPass.draw(mesh.numVertices);
-                console.log('hello', mesh)
-            }
-
-        });
+            renderPass.setIndexBuffer(mesh.indexBuffer, "uint16");
+            renderPass.drawIndexed(mesh.numElements);
+        }
 
         renderPass.end();
 

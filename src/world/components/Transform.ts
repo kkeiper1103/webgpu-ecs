@@ -1,6 +1,6 @@
 import {vec3, mat4, quat} from 'gl-matrix'
 import device from "@gpu/device.ts";
-import {Component} from "ape-ecs";
+import {Component} from "@jakeklassen/ecs";
 
 export default class Transform extends Component {
     static nextId: number = 1;
@@ -11,8 +11,14 @@ export default class Transform extends Component {
     protected _quat: quat = quat.create();
     protected _model: mat4 = mat4.create();
 
-    init(initial: any) {
-        super.init(initial);
+
+    constructor(
+        public position: vec3 = [0, 0, 0],
+        public rotation: vec3 = [0, 0, 0],
+        public scale: vec3 = [1, 1, 1],
+        public origin: vec3 = [0, 0, 0]
+    ) {
+        super()
 
         this._id = Transform.nextId++;
 
@@ -26,8 +32,6 @@ export default class Transform extends Component {
 
     destroy() {
         this.buffer.destroy();
-
-        super.destroy();
     }
 
     get model(): mat4 {
@@ -37,16 +41,3 @@ export default class Transform extends Component {
         return this._model;
     }
 }
-
-type TransformComponentPropertiesType = {
-    position: vec3,
-    rotation: vec3,
-    scale: vec3,
-    origin: vec3
-};
-Transform.properties = {
-    position: [0, 0, 0],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-    origin: [0, 0, 0]
-};

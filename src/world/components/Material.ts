@@ -1,5 +1,15 @@
-import {Component} from "ape-ecs";
+import {Component} from "@jakeklassen/ecs";
 import device from "@gpu/device.ts";
+
+type Props = {
+    size: Array<number>,
+
+    textureDescriptor: GPUTextureDescriptor,
+    samplerDescriptor: GPUSamplerDescriptor,
+
+    pixels?: number[] | Uint8ClampedArray,
+    image?: ImageBitmap
+};
 
 export default class Material extends Component {
 
@@ -9,20 +19,19 @@ export default class Material extends Component {
     texture: GPUTexture;
     sampler: GPUSampler;
 
-
-    init(initial: any) {
-        super.init(initial);
+    constructor(initial: Props) {
+        super();
 
         this._id = Material.nextId++;
 
-        let size = initial.size || this.size;
+        let size = initial.size;
         if(initial.image) size = [initial.image.width, initial.image.height];
 
-        let pixels = initial.pixels || this.pixels;
-        let textureDescriptor = initial.textureDescriptor || this.textureDescriptor;
+        let pixels = initial.pixels;
+        let textureDescriptor = initial.textureDescriptor;
         textureDescriptor.label = "Texture Handle for Material #" + this._id;
 
-        let samplerDescriptor = initial.samplerDescriptor || this.samplerDescriptor;
+        let samplerDescriptor = initial.samplerDescriptor;
         samplerDescriptor.label = "Sampler Handle for Material #" + this._id;
 
         // wrap the pixels if they're not a Uint8ClampedArray
@@ -65,25 +74,5 @@ export default class Material extends Component {
 
     destroy() {
         this.texture.destroy()
-
-        super.destroy();
     }
 }
-
-Material.properties = {
-    texture: undefined,
-    sampler: undefined,
-
-    size: [1, 1],
-
-    textureDescriptor: {
-        label: "Texture for Material",
-        format: "rgba8unorm",
-        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST
-    },
-
-    samplerDescriptor: {},
-
-    pixels: new Uint8ClampedArray([255, 255, 255, 255]),
-    image: undefined
-};
