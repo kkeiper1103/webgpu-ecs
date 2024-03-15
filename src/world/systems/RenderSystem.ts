@@ -5,19 +5,16 @@ import device, {context} from "@gpu/device.ts";
 import Mesh from "../components/Mesh.ts";
 import Transform from "../components/Transform.ts";
 import MetaValues from "../components/MetaValues.ts";
-
 import Material from "../components/Material.ts";
+
 import {positionColorUvPipeline} from "@gpu/pipelines.ts";
-import IndexedMesh from "../components/IndexedMesh.ts";
 
 
 let meshQuery: Query,
-    indexedMeshQuery: Query,
     buffers: GPUBuffer[],
     projectionViewBindGroup: GPUBindGroup,
     colorTexture: GPUTexture,
     depthTexture: GPUTexture;
-
 
 
 /**
@@ -29,10 +26,7 @@ export default class RenderSystem extends System {
         super.init(...initArgs);
 
         meshQuery = this.createQuery()
-            .fromAll(Mesh.name, Transform.name, Material.name);
-
-        indexedMeshQuery = this.createQuery()
-            .fromAll(IndexedMesh.name, Transform.name, Material.name);
+            .fromAll(Mesh.name, Transform.name, Material.name).persist();
 
         // create color texture
         colorTexture = device.createTexture({
@@ -82,7 +76,6 @@ export default class RenderSystem extends System {
         device.queue.writeBuffer(buffers[0], 0, mat4.perspective(mat4.create(), 45 * Math.PI / 180, 1024 / 768, .1, 100));
         device.queue.writeBuffer(buffers[1], 0, mat4.lookAt(mat4.create(), [0, 5, 5], [0, 0, 0], [0, 1, 0]));
 
-
         const encoder = device.createCommandEncoder();
 
         let renderPass = encoder.beginRenderPass({
@@ -102,67 +95,6 @@ export default class RenderSystem extends System {
         });
 
         renderPass.setBindGroup(0, projectionViewBindGroup);
-
-        this.drawIndexedMeshes(renderPass);
-        this.drawNonIndexedMeshes(renderPass);
-
-        renderPass.end();
-
-        device.queue.submit([encoder.finish()])
-    }
-
-    protected drawIndexedMeshes(renderPass: GPURenderPassEncoder): void {
-
-        indexedMeshQuery.refresh().execute().forEach(e => {
-            const mesh = <IndexedMesh> e.getOne(IndexedMesh.name),
-                transform = <Transform> e.getOne(Transform.name),
-                material = <Material> e.getOne(Material.name);
-
-            //
-            if(!e.has(MetaValues.name)) {
-                const meta = {
-                    type: MetaValues.name,
-
-                    modelBindGroup: device.createBindGroup({
-                        label: "Model BindGroup",
-                        layout: positionColorUvPipeline.getBindGroupLayout(1),
-                        entries: [{
-                            binding: 0,
-                            resource: { buffer: transform.buffer }
-                        }]
-                    }),
-
-                    materialBindGroup: device.createBindGroup({
-                        label: "Material BindGroup",
-                        layout: positionColorUvPipeline.getBindGroupLayout(2),
-                        entries: [{
-                            binding: 0,
-                            resource: material.sampler
-                        }, {
-                            binding: 1,
-                            resource: material.texture.createView()
-                        }]
-                    })
-                }
-
-                e.addComponent(meta);
-            }
-
-            const meta = e.getOne(MetaValues.name) as MetaValues;
-            device.queue.writeBuffer(transform.buffer, 0, transform.model);
-
-            renderPass.setPipeline(mesh.pipeline);
-            renderPass.setBindGroup(1, meta.modelBindGroup);
-            renderPass.setBindGroup(2, meta.materialBindGroup);
-            renderPass.setVertexBuffer(0, mesh.buffers[0]);
-            renderPass.setVertexBuffer(1, mesh.buffers[1]);
-            renderPass.setVertexBuffer(2, mesh.buffers[2]);
-            renderPass.setIndexBuffer(mesh.indexBuffer, "uint32");
-            renderPass.drawIndexed(mesh.numElements);
-        });
-    }
-
-    protected drawNonIndexedMeshes(renderPass: GPURenderPassEncoder): void {
         meshQuery.refresh().execute().forEach(e => {
             const mesh = <Mesh> e.getOne(Mesh.name),
                 transform = <Transform> e.getOne(Transform.name),
@@ -204,10 +136,21 @@ export default class RenderSystem extends System {
             renderPass.setPipeline(mesh.pipeline);
             renderPass.setBindGroup(1, meta.modelBindGroup);
             renderPass.setBindGroup(2, meta.materialBindGroup);
+
             renderPass.setVertexBuffer(0, mesh.buffers[0]);
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
             renderPass.setVertexBuffer(2, mesh.buffers[2]);
-            renderPass.draw(mesh.numVertices);
+
+            if(mesh.numElements > 0) {
+                renderPass.setIndexBuffer(mesh.indexBuffer, "uint32");
+                renderPass.drawIndexed(mesh.numElements, 1);
+            } else {
+                renderPass.draw(mesh.numVertices, 1);
+            }
         });
+
+        renderPass.end();
+
+        device.queue.submit([encoder.finish()])
     }
 }

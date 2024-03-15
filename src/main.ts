@@ -1,9 +1,24 @@
 import './style.css'
 
 import world from "./world";
+import {Entity} from "ape-ecs";
+import Material from "./world/components/Material.ts";
 
-// createTestEntity();
-createIndexedEntity();
+
+
+const e1 = createIndexedEntity();
+e1.c.Transform.position = [-1, 0, 3];
+
+const e2 = createIndexedEntity();
+e2.c.Transform.position = [2, 0, 2];
+
+const e4 = createTestEntity();
+e4.c.Transform.position = [-2, 0, -2];
+
+const e3 = createTestEntity();
+e3.c.Transform.position = [3, 3, -3];
+
+
 
 let last = performance.now();
 requestAnimationFrame(function render(now) {
@@ -12,15 +27,17 @@ requestAnimationFrame(function render(now) {
     const dt = (now - last) / 1000;
     last = now;
 
+
+
     world.runSystems("update");
     world.runSystems("render");
+    world.tick()
 });
 
 function createIndexedEntity() {
-    const e = world.createEntity({
-        id: 'indexed-entity',
+    return world.createEntity({
         c: {
-            IndexedMesh: {
+            Mesh: {
                 positions: [
                     .5, .5, 0,
                     .5, -.5, 0,
@@ -67,71 +84,73 @@ function createIndexedEntity() {
 }
 
 //
-function createTestEntity() {
+function createTestEntity() : Entity {
+    let e = world.createEntity({
+        c: {
+            Mesh: {
+                positions: [
+                    1, 1, 0,
+                    1, -1, 0,
+                    -1, 1, 0,
+
+                    1, -1, 0,
+                    -1, -1, 0,
+                    -1, 1, 0
+                ],
+                colors: [
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                    1, 1, 0,
+                ],
+                uvs: [
+                    1, 0,
+                    1, 1,
+                    0, 0,
+
+                    1, 1,
+                    0, 1,
+                    0, 0
+                ]
+            },
+
+            Transform: {
+                position: [1, 0, 0],
+                rotation: [0, 0, 0],
+                scale: [2, 2, 2]
+            },
+        }
+    });
+
     let image = new Image();
     image.onload = () => {
-        const e = world.createEntity({
-            id: "zomboid-screen",
-            c: {
-                Mesh: {
-                    positions: [
-                        1, 1, 0,
-                        1, -1, 0,
-                        -1, 1, 0,
+        e.addComponent({
+            type: Material.name,
+            image,
 
-                        1, -1, 0,
-                        -1, -1, 0,
-                        -1, 1, 0
-                    ],
-                    colors: [
-                        1, 1, 0,
-                        1, 1, 0,
-                        1, 1, 0,
-                        1, 1, 0,
-                        1, 1, 0,
-                        1, 1, 0,
-                    ],
-                    uvs: [
-                        1, 0,
-                        1, 1,
-                        0, 0,
+            /*
+            these are overridden when image is passed as an ImageBitmap
 
-                        1, 1,
-                        0, 1,
-                        0, 0
-                    ]
-                },
+            pixels: [
+                255, 0, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 0, 255, 255
+            ],
+            size: [2, 2],
 
-                Transform: {
-                    position: [1, 0, 0],
-                    rotation: [0, 0, 0],
-                    scale: [2, 2, 2]
-                },
+            */
 
-                Material: {
-                    image,
-
-                    /*
-                    these are overridden when image is passed as an ImageBitmap
-
-                    pixels: [
-                        255, 0, 255, 255, 255, 255, 255, 255,
-                        255, 255, 255, 255, 255, 0, 255, 255
-                    ],
-                    size: [2, 2],
-
-                    */
-
-                    samplerDescriptor: {
-                        addressModeU: "clamp-to-edge",
-                        addressModeV: "clamp-to-edge",
-                        minFilter: "linear",
-                        magFilter: "linear"
-                    } as GPUSamplerDescriptor
-                }
-            }
-        });
+            samplerDescriptor: {
+                addressModeU: "clamp-to-edge",
+                addressModeV: "clamp-to-edge",
+                minFilter: "linear",
+                magFilter: "linear"
+            } as GPUSamplerDescriptor
+        })
     }
     image.onerror = () => { console.log('error') }
     image.src = "/zomboid.png";
+
+    return e;
 }

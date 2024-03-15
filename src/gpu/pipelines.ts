@@ -8,7 +8,7 @@ let positionColorUvShader = device.createShaderModule({
 });
 
 const positionColorUvPipeline = device.createRenderPipeline({
-    label: "Basic Render Pipeline",
+    label: "Basic Render Pipeline for Position/Color/UV",
     layout: "auto",
     vertex: {
         module: positionColorUvShader,

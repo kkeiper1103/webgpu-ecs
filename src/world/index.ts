@@ -13,7 +13,6 @@ const world = new World();
 
 
 world.registerComponent(Mesh);
-world.registerComponent(IndexedMesh);
 world.registerComponent(Transform);
 world.registerComponent(MetaValues);
 world.registerComponent(Material);

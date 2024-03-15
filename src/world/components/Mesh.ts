@@ -7,8 +7,10 @@ import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 export default class Mesh extends Component {
     buffers: GPUBuffer[] = [];
+    indexBuffer: GPUBuffer;
     pipeline: GPURenderPipeline = positionColorUvPipeline;
     numVertices: number = 0;
+    numElements: number = 0;
 
     init(initial: any) {
         super.init(initial);
@@ -39,12 +41,23 @@ export default class Mesh extends Component {
         device.queue.writeBuffer(this.buffers[2], 0, uvs);
 
         //
+        const indices = new Uint32Array(initial.indices);
+        this.indexBuffer = device.createBuffer({
+            label: "Index Buffer",
+            size: indices.byteLength,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
+        });
+        device.queue.writeBuffer(this.indexBuffer, 0, indices);
+        this.numElements = indices.length;
+
+        //
         if(!!initial.pipeline)
             this.pipeline = positionColorUvPipeline;
     }
 
 
     destroy() {
+        this.indexBuffer.destroy();
         this.buffers.forEach(buffer => buffer.destroy());
 
         super.destroy();
@@ -53,6 +66,8 @@ export default class Mesh extends Component {
 
 Mesh.properties = {
     buffers: Array<GPUBuffer>(),
+    indexBuffer: null,
+    indices: [],
     positions: [],
     uvs: [],
     colors: [], // should this be a uniform instead?
