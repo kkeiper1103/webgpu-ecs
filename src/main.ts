@@ -5,8 +5,10 @@ import world from "./world";
 import Material from "./world/components/Material.ts";
 import Mesh from "./world/components/Mesh.ts";
 import Transform from "./world/components/Transform.ts";
+import createMapTerrain from "./world/entities/map.ts";
 
 
+createMapTerrain(1234);
 
 
 const e3 = createTestEntity();

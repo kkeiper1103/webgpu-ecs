@@ -12,6 +12,7 @@ export default defineConfig({
     resolve: {
         alias: {
             "@gpu": "/src/gpu",
+            "@assets": "/assets"
         }
     }
 });

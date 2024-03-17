@@ -28,6 +28,9 @@
     "paths": {
       "@gpu/*": [
         "./src/gpu/*"
+      ],
+      "@assets/*": [
+        "./assets/*"
       ]
     }
   },

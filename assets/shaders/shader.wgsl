@@ -37,5 +37,7 @@ fn fragment(
 ) -> @location(0) vec4f {
     var texel: vec4f = textureSample(uTexture, uSampler, input.uv);
 
-    return mix(texel, vec4f(input.color, 1.f), .2);
+    return texel;
+
+    // return mix(texel, vec4f(input.color, 1.f), .2);
 }
