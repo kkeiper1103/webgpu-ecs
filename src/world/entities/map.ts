@@ -6,11 +6,11 @@ import Transform from "../components/Transform.ts";
 // import heights from "@assets/data/map.js"
 import mapgen from "@assets/data/simplex-map.js"
 
-const MAP_SIZE = 64;
+// @todo move to some sort of config file that isn't committed so this doesn't cause merge conflicts
+const MAP_SIZE = 128;
 let idx = (x: number, z: number): number => z * MAP_SIZE + x;
 
 const heights = [];
-
 for(let z=0; z < MAP_SIZE; z++) {
     for(let x = 0; x < MAP_SIZE; x++) {
         let idx = z * MAP_SIZE + x;
