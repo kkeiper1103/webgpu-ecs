@@ -5,24 +5,43 @@ import Transform from "../components/Transform.ts";
 
 import heights from "@assets/data/map.js"
 
-let idx = (x: number, z: number): number => z * 8 + x;
+const MAP_SIZE = 8;
+let idx = (x: number, z: number): number => z * MAP_SIZE + x;
 
 function createMapTerrain(seed: number) {
     const e = world.createEntity();
 
     let positions: number[] = [], uvs: number[] = [], colors: number[] = [], indices: number[] = [];
 
-    for(let z=0; z < 8; z++) {
-        for(let x=0; x < 8; x++) {
-            let idx = z * 8 + x;
+    let start = 0;
+    for(let z=0; z < MAP_SIZE - 1; z++) {
+        for(let x=0; x < MAP_SIZE - 1; x++) {
 
             indices.push(
-                0, 1, 2,
-                2, 1, 3,
+                start, start + 1, start + 2,
+                start, start + 2, start + 3,
             );
+            start += 4;
 
             positions.push(
-                x,
+                x, heights[idx(x, z)], z,
+                x + 1, heights[idx(x + 1, z)], z,
+                x + 1, heights[idx(x + 1, z + 1)], z + 1,
+                x, heights[idx(x, z + 1)], z + 1,
+            );
+
+            uvs.push(
+                0, 0,
+                1, 0,
+                1, 1,
+                0, 1,
+            );
+
+            colors.push(
+                127, 127, 127,
+                127, 127, 127,
+                127, 127, 127,
+                127, 127, 127,
             );
         }
     }
@@ -55,7 +74,11 @@ function createMapTerrain(seed: number) {
         }
     });
 
-    world.addEntityComponents(e, mesh, material, new Transform());
+    let transform = new Transform();
+    transform.position[0] = - MAP_SIZE / 2;
+    transform.position[2] = - MAP_SIZE / 2;
+
+    world.addEntityComponents(e, mesh, material, transform);
 
     return e;
 }
