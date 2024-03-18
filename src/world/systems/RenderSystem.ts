@@ -103,39 +103,11 @@ export default class RenderSystem extends System {
                 material = componentMap.get(Material);
 
 
-            if(!componentMap.has(MetaValues)) {
-                const meta = new MetaValues();
-                meta.modelBindGroup = device.createBindGroup({
-                    label: "Model BindGroup",
-                    layout: positionColorUvPipeline.getBindGroupLayout(1),
-                    entries: [{
-                        binding: 0,
-                        resource: { buffer: transform.buffer }
-                    }]
-                });
-
-                meta.materialBindGroup = device.createBindGroup({
-                    label: "Material BindGroup",
-                    layout: positionColorUvPipeline.getBindGroupLayout(2),
-                    entries: [{
-                        binding: 0,
-                        resource: material.sampler
-                    }, {
-                        binding: 1,
-                        resource: material.texture.createView()
-                    }]
-                });
-
-                componentMap.add(meta);
-            }
-
-            const meta = <MetaValues> componentMap.get(MetaValues);
             device.queue.writeBuffer(transform.buffer, 0, transform.model);
 
-
             renderPass.setPipeline(mesh.pipeline);
-            renderPass.setBindGroup(1, meta.modelBindGroup);
-            renderPass.setBindGroup(2, meta.materialBindGroup);
+            renderPass.setBindGroup(1, transform.bindgroup);
+            renderPass.setBindGroup(2, material.bindgroup);
 
             renderPass.setVertexBuffer(0, mesh.buffers[0]);
             renderPass.setVertexBuffer(1, mesh.buffers[1]);

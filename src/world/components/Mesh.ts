@@ -25,7 +25,12 @@ export default class Mesh extends Component {
     numVertices: number = 0;
     numElements: number = 0;
 
-    constructor(initial: Props) {
+    constructor(initial: Props = {
+        positions: [],
+        uvs: [],
+        colors: [],
+        indices: []
+    }) {
         super();
 
         this._id = Mesh.nextId++;

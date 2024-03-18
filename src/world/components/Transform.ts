@@ -1,6 +1,7 @@
 import {vec3, mat4, quat} from 'gl-matrix'
 import device from "@gpu/device.ts";
 import {Component} from "@jakeklassen/ecs";
+import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 export default class Transform extends Component {
     static nextId: number = 1;
@@ -11,6 +12,7 @@ export default class Transform extends Component {
     protected _quat: quat = quat.create();
     protected _model: mat4 = mat4.create();
 
+    bindgroup: GPUBindGroup;
 
     constructor(
         public position: vec3 = [0, 0, 0],
@@ -28,6 +30,15 @@ export default class Transform extends Component {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
         });
         device.queue.writeBuffer(this.buffer, 0, this.model);
+
+        this.bindgroup = device.createBindGroup({
+            label: "Model BindGroup",
+            layout: positionColorUvPipeline.getBindGroupLayout(1),
+            entries: [{
+                binding: 0,
+                resource: { buffer: this.buffer }
+            }]
+        });
     }
 
     destroy() {

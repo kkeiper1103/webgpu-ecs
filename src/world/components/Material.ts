@@ -1,5 +1,6 @@
 import {Component} from "@jakeklassen/ecs";
 import device from "@gpu/device.ts";
+import {positionColorUvPipeline} from "@gpu/pipelines.ts";
 
 type Props = {
     size: Array<number>,
@@ -18,6 +19,8 @@ export default class Material extends Component {
 
     texture: GPUTexture;
     sampler: GPUSampler;
+
+    bindgroup: GPUBindGroup;
 
     constructor(initial: Props) {
         super();
@@ -70,6 +73,18 @@ export default class Material extends Component {
                 }
             );
         }
+
+        this.bindgroup = device.createBindGroup({
+            label: "Material BindGroup",
+            layout: positionColorUvPipeline.getBindGroupLayout(2),
+            entries: [{
+                binding: 0,
+                resource: this.sampler
+            }, {
+                binding: 1,
+                resource: this.texture.createView()
+            }]
+        });
     }
 
     destroy() {
