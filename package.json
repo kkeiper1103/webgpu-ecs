@@ -11,6 +11,8 @@
   "devDependencies": {
     "@jakeklassen/ecs": "^4.0.6",
     "@webgpu/types": "^0.1.40",
+    "@xavier.seignard/simplex-noise": "^4.0.3",
+    "alea": "^1.0.1",
     "gl-matrix": "^3.4.3",
     "typescript": "^5.2.2",
     "vite": "^5.1.6",
