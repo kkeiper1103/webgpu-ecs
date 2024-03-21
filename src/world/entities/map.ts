@@ -30,11 +30,28 @@ for(let z=0; z < MAP_SIZE; z += 1) {
 
 import grass from "@assets/images/grass.png?url"
 import {EntityId} from "@jakeklassen/ecs";
+import {MapTag} from "../components/Tags.ts";
+import {vec3} from "gl-matrix";
+
+function normal(a: vec3, b: vec3, c: vec3): vec3 {
+    let ba = vec3.create(),
+        ca = vec3.create();
+
+    vec3.sub(ba, b, a);
+    vec3.sub(ca, c, a);
+
+    let out = vec3.create();
+
+    vec3.cross(out, ba, ca);
+    vec3.normalize(out, out);
+
+    return out;
+}
 
 function createMapTerrain(seed: number): EntityId {
     const e = world.createEntity();
 
-    let positions: number[] = [], uvs: number[] = [], colors: number[] = [], indices: number[] = [];
+    let positions: number[] = [], uvs: number[] = [], colors: number[] = [], indices: number[] = [], normals: number[] = [];
 
     let start = 0;
     // @todo introduce subdivision of mesh to allow for finer grain triangles.
@@ -48,11 +65,15 @@ function createMapTerrain(seed: number): EntityId {
             );
             start += 4;
 
+            let a = [x,      heights[idx(x, z)],                z],
+                b = [x + 1,  heights[idx(x + 1, z)],         z],
+                c = [x + 1,  heights[idx(x + 1, z + 1)],  z + 1],
+                d = [x,      heights[idx(x, z + 1)],         z + 1];
             positions.push(
-                x,      heights[idx(x, z)],                z,
-                x + 1,  heights[idx(x + 1, z)],         z,
-                x + 1,  heights[idx(x + 1, z + 1)],  z + 1,
-                x,      heights[idx(x, z + 1)],         z + 1,
+                ...a,
+                ...b,
+                ...c,
+                ...d,
             );
 
             uvs.push(
@@ -68,11 +89,21 @@ function createMapTerrain(seed: number): EntityId {
                 127, 127, 127,
                 127, 127, 127,
             );
+
+            // must match order of indices above. 0, 1, 2 ... 0, 2, 3
+            let normal_a = normal(a, b, c);
+            let normal_b = normal(a, c, d);
+            normals.push(
+                ...normal_a,
+                ...normal_a,
+                ...normal_b,
+                ...normal_b,
+            );
         }
     }
 
     let mesh = new Mesh({
-        positions, colors, uvs, indices
+        positions, colors, uvs, indices, normals
     });
 
     let darkgreen = [1, 50, 32, 255],
@@ -103,7 +134,7 @@ function createMapTerrain(seed: number): EntityId {
     transform.position[0] = - MAP_SIZE / 2;
     transform.position[2] = - MAP_SIZE / 2;
 
-    world.addEntityComponents(e, mesh, material, transform);
+    world.addEntityComponents(e, mesh, material, transform, new MapTag(heights, MAP_SIZE, MAP_SIZE));
 
 
     let image = new Image();

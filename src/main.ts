@@ -6,9 +6,11 @@ import Material from "./world/components/Material.ts";
 import Mesh from "./world/components/Mesh.ts";
 import Transform from "./world/components/Transform.ts";
 import createMapTerrain from "./world/entities/map.ts";
+import createPlayer from "./world/entities/player.ts";
 
 
-createMapTerrain(1234);
+const map = createMapTerrain(1234);
+const player = createPlayer([16.544, 2.8]);
 
 
 const e3 = createTestEntity();
@@ -64,6 +66,13 @@ function createIndexedEntity(): number {
             0, 1,
             1, 0,
             1, 1,
+        ],
+
+        normals: [
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
         ],
         indices: [
             0, 1, 2,
@@ -133,6 +142,15 @@ function createTestEntity() : number {
                 1, 0, //2
                 0, 1, //1
                 1, 1, //3
+            ],
+            normals: [
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1,
+
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1,
             ]
         }),
         transform = new Transform();

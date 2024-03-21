@@ -8,6 +8,7 @@ type Props = {
     positions: number[],
     uvs: number[],
     colors: number[],
+    normals: number[],
     indices?: number[],
 
     pipeline?: GPURenderPipeline
@@ -29,7 +30,8 @@ export default class Mesh extends Component {
         positions: [],
         uvs: [],
         colors: [],
-        indices: []
+        indices: [],
+        normals: []
     }) {
         super();
 
@@ -59,6 +61,14 @@ export default class Mesh extends Component {
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
         device.queue.writeBuffer(this.buffers[2], 0, uvs);
+
+        const normals = new Float32Array(initial.normals);
+        this.buffers[3] = device.createBuffer({
+            label: `Normal Buffer for Mesh #${this._id}`,
+            size: normals.byteLength,
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+        });
+
 
         let indices: any = initial.indices || generateIndices(initial.positions);
 

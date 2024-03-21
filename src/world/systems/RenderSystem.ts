@@ -112,6 +112,7 @@ export default class RenderSystem extends System {
             renderPass.setVertexBuffer(0, mesh.buffers[0]);
             renderPass.setVertexBuffer(1, mesh.buffers[1]);
             renderPass.setVertexBuffer(2, mesh.buffers[2]);
+            renderPass.setVertexBuffer(3, mesh.buffers[3]);
 
             renderPass.setIndexBuffer(mesh.indexBuffer, "uint16");
             renderPass.drawIndexed(mesh.numElements);

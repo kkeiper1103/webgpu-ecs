@@ -22,7 +22,24 @@ export default class Material extends Component {
 
     bindgroup: GPUBindGroup;
 
-    constructor(initial: Props) {
+    constructor(initial: Props = {
+        pixels: [
+            255, 0, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 0, 255, 255
+        ],
+        size: [2, 2],
+        textureDescriptor: {
+            size: [2, 2],
+            format: "rgba8unorm",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
+        },
+        samplerDescriptor: {
+            magFilter: "nearest",
+            minFilter: "nearest",
+            addressModeV: "repeat",
+            addressModeU: "repeat"
+        }
+    }) {
         super();
 
         this._id = Material.nextId++;

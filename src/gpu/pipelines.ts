@@ -7,34 +7,46 @@ let positionColorUvShader = device.createShaderModule({
     code: shader_src
 });
 
+const positionBufferFormat: GPUVertexBufferLayout = {
+    arrayStride: 12,
+    attributes: [{
+        format: "float32x3",
+        offset: 0,
+        shaderLocation: 0
+    }]
+};
+const colorBufferFormat: GPUVertexBufferLayout = {
+    arrayStride: 12,
+    attributes: [{
+        format: "float32x3",
+        offset: 0,
+        shaderLocation: 1
+    }]
+};
+const uvBufferFormat: GPUVertexBufferLayout = {
+    arrayStride: 8,
+    attributes: [{
+        format: "float32x2",
+        offset: 0,
+        shaderLocation: 2
+    }]
+};
+const normalBufferFormat: GPUVertexBufferLayout = {
+    arrayStride: 12,
+    attributes: [{
+        format: "float32x3",
+        offset: 0,
+        shaderLocation: 3
+    }]
+};
+
 const positionColorUvPipeline = device.createRenderPipeline({
     label: "Basic Render Pipeline for Position/Color/UV",
     layout: "auto",
     vertex: {
         module: positionColorUvShader,
         entryPoint: "vertex",
-        buffers: [{
-            arrayStride: 12,
-            attributes: [{
-                format: "float32x3",
-                offset: 0,
-                shaderLocation: 0
-            }]
-        }, {
-            arrayStride: 12,
-            attributes: [{
-                format: "float32x3",
-                offset: 0,
-                shaderLocation: 1
-            }]
-        }, {
-            arrayStride: 8,
-            attributes: [{
-                format: "float32x2",
-                offset: 0,
-                shaderLocation: 2
-            }]
-        }]
+        buffers: [positionBufferFormat, colorBufferFormat, uvBufferFormat, normalBufferFormat]
     },
     fragment: {
         module: positionColorUvShader,
